@@ -1,0 +1,290 @@
+@import "tailwindcss";
+
+/* dark mode keyed to data-theme, not media query (user toggle) */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+/* ============================================================
+   entri — DESIGN.md tokens (Marginalia, dialed back)
+   Raw vars flip with [data-theme]; Tailwind maps onto them.
+   ============================================================ */
+:root {
+  --paper: #f7f1e6;
+  --paper-2: #fbf6ec;
+  --surface: #f0e9df;
+  --line: #d9cdb8;
+  --rule: #cadae8;
+  --ink: #1e1913;
+  --ink-soft: #52493c;
+  --muted: #766b54; /* darkened from #9c8e78 for AA (~4.7:1 on paper) */
+  --marigold: #e0913a;
+  --marigold-deep: #c2741f;
+  --hi: #ffd27a;
+  --teal: #1f5a4c;
+  --teal-soft: #dceae2;
+  --taupe: #a6987f; /* treatment only (dashed border / sticky bg) */
+  --taupe-ink: #6c6353; /* readable taupe for AI-inferred TEXT (~4.9:1) */
+  --brick: #a93d27;
+  --info: #3e6b8a;
+  --on-marigold: #2a1c08;
+  --tape: rgba(224, 145, 58, 0.22);
+  --tape-edge: rgba(255, 255, 255, 0.4);
+  --shadow-paper: 0 1px 2px rgba(30, 25, 19, 0.05),
+    0 14px 32px -18px rgba(30, 25, 19, 0.28);
+}
+[data-theme="dark"] {
+  --paper: #181511;
+  --paper-2: #201b15;
+  --surface: #2a251f;
+  --line: #352d22;
+  --rule: #2a3540;
+  --ink: #f0e8da;
+  --ink-soft: #c2b6a2;
+  --muted: #9a8b72; /* lightened from #8a7c66 for AA on dark paper */
+  --marigold: #eba459;
+  --marigold-deep: #f0b568;
+  --hi: #7a5e1f;
+  --teal: #5ba188;
+  --teal-soft: #1c2a24;
+  --taupe: #9c8e78; /* treatment only */
+  --taupe-ink: #b3a589; /* readable taupe for AI-inferred TEXT on dark */
+  --brick: #d26450;
+  --info: #6b9bc0;
+  --on-marigold: #2a1c08;
+  --tape: rgba(235, 164, 89, 0.18);
+  --tape-edge: rgba(240, 232, 218, 0.18);
+  --shadow-paper: 0 1px 2px rgba(0, 0, 0, 0.4),
+    0 14px 32px -16px rgba(0, 0, 0, 0.65);
+}
+
+@theme inline {
+  /* colors → bg-paper, text-ink, border-line, bg-marigold, ... */
+  --color-paper: var(--paper);
+  --color-paper2: var(--paper-2);
+  --color-surface: var(--surface);
+  --color-line: var(--line);
+  --color-rule: var(--rule);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-muted: var(--muted);
+  --color-marigold: var(--marigold);
+  --color-marigold-deep: var(--marigold-deep);
+  --color-hi: var(--hi);
+  --color-teal: var(--teal);
+  --color-teal-soft: var(--teal-soft);
+  --color-taupe: var(--taupe);
+  --color-taupe-ink: var(--taupe-ink);
+  --color-brick: var(--brick);
+  --color-info: var(--info);
+  --color-on-marigold: var(--on-marigold);
+
+  /* fonts → font-display, font-body, font-mono (wired to next/font vars) */
+  --font-display: var(--font-fraunces), Georgia, serif;
+  --font-body: var(--font-instrument), system-ui, sans-serif;
+  --font-mono: var(--font-plex-mono), monospace;
+
+  /* radius → rounded-sm / rounded-md (paper-like, no pills on chrome) */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+
+  --shadow-paper: var(--shadow-paper);
+}
+
+@layer base {
+  body {
+    @apply bg-paper text-ink font-body antialiased;
+    transition: background-color 0.35s, color 0.35s;
+  }
+  /* very light paper grain over everything */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+    opacity: 0.7;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+  }
+}
+
+@layer components {
+  /* paper card — the app's base container */
+  .card {
+    @apply bg-paper2 border border-line rounded-md;
+    box-shadow: var(--shadow-paper);
+  }
+
+  /* mono section label / kicker */
+  .kicker {
+    @apply font-mono text-[11px] tracking-[0.1em] uppercase text-muted;
+  }
+
+  /* buttons */
+  .btn-p {
+    @apply inline-flex items-center justify-center gap-2 font-semibold text-[15px] rounded-sm px-5 py-3 transition duration-150 cursor-pointer bg-marigold text-on-marigold hover:bg-marigold-deep hover:-translate-y-px active:translate-y-0;
+  }
+  .btn-s {
+    @apply inline-flex items-center justify-center gap-2 font-semibold text-[15px] rounded-sm px-5 py-3 transition duration-150 cursor-pointer bg-transparent border-[1.5px] border-ink text-ink hover:bg-ink hover:text-paper active:opacity-90;
+  }
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 font-semibold text-[15px] rounded-sm px-5 py-3 transition duration-150 cursor-pointer bg-transparent text-ink-soft hover:text-ink hover:bg-surface active:opacity-90;
+  }
+
+  /* text input — quiet paper field */
+  .field {
+    @apply w-full bg-paper border border-line rounded-sm px-3.5 py-2.5 text-[14.5px] text-ink placeholder:text-muted transition-colors focus:border-marigold;
+  }
+
+  /* topic chip on study cards */
+  .chip {
+    @apply inline-block font-mono text-[10.5px] uppercase tracking-[0.08em] text-ink-soft rounded-[3px] px-2 py-[3px];
+    background: color-mix(in srgb, var(--marigold) 16%, transparent);
+  }
+  .chip-inferred {
+    @apply inline-block font-mono text-[10.5px] uppercase tracking-[0.08em] text-taupe-ink rounded-[3px] px-2 py-[3px] bg-transparent border border-dashed border-taupe;
+  }
+
+  /* ruled provenance slip — the one notebook surface on app screens */
+  .prov-slip {
+    @apply bg-paper2 border border-line rounded-sm px-[18px] pt-4 pb-[14px] font-display italic text-[15px] leading-[1.75] text-ink-soft rotate-[0.4deg];
+    box-shadow: var(--shadow-paper);
+    background-image: linear-gradient(var(--rule) 1px, transparent 1px);
+    background-size: 100% 26px;
+    background-position: 0 12px;
+  }
+  /* highlighter swipe — ONE per view, on the verified source line */
+  .hl-swipe {
+    @apply text-ink not-italic font-semibold relative whitespace-nowrap;
+  }
+  .hl-swipe::before {
+    content: "";
+    position: absolute;
+    left: -4px;
+    right: -4px;
+    top: 10%;
+    bottom: 4%;
+    background: var(--hi);
+    transform: skewX(-6deg) rotate(-0.6deg);
+    z-index: -1;
+    border-radius: 3px;
+  }
+
+  /* AI-inferred — always visibly tentative (dashed taupe, never confirmed-styled) */
+  .inferred-card {
+    @apply rounded-md border border-dashed px-[18px] py-4;
+    background: color-mix(in srgb, var(--taupe) 14%, var(--paper-2));
+    border-color: color-mix(in srgb, var(--taupe) 55%, transparent);
+  }
+
+  /* sticky-note tape strip */
+  .tape-strip {
+    position: absolute;
+    width: 96px;
+    height: 24px;
+    background: var(--tape);
+    border-left: 1px dashed var(--tape-edge);
+    border-right: 1px dashed var(--tape-edge);
+    top: -11px;
+    left: 50%;
+    transform: translateX(-50%) rotate(-1.5deg);
+    backdrop-filter: blur(1px);
+  }
+}
+
+@utility tabnum {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Visible keyboard focus — one warm ring for every interactive element
+   (DESIGN.md: marigold is the signature accent). Unlayered on purpose so it
+   wins over Tailwind's layered resets; never rely on color alone (WCAG 2.4.7). */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible,
+summary:focus-visible,
+[role="button"]:focus-visible,
+[role="radio"]:focus-visible,
+[tabindex]:not([tabindex="-1"]):focus-visible {
+  outline: 2px solid var(--marigold);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* The chat composer shows focus on its surrounding box (focus-within), so the
+   inner textarea suppresses its own ring — no double border. */
+.composer-field:focus-visible {
+  outline: none;
+}
+
+/* Knowledge-graph hover popover. force-graph (float-tooltip) injects a dark
+   .float-tooltip-kap box at runtime; override it into a Marginalia paper slip.
+   !important is needed to beat the library's own injected stylesheet. */
+.float-tooltip-kap {
+  background: var(--paper-2) !important;
+  color: var(--ink) !important;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md) !important;
+  box-shadow: var(--shadow-paper);
+  padding: 9px 11px !important;
+  max-width: 280px !important;
+  white-space: normal !important;
+  font: 400 13px/1.4 var(--font-body) !important;
+}
+.float-tooltip-kap .gt-q {
+  font-weight: 600;
+  font-size: 13px;
+  line-height: 1.35;
+}
+/* AI-inferred concepts read tentative even in the popover (never confirmed-styled). */
+.float-tooltip-kap .gt-concept {
+  color: var(--taupe-ink);
+  font-style: italic;
+}
+.float-tooltip-kap .gt-a {
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--ink-soft);
+  margin-top: 4px;
+}
+.float-tooltip-kap .gt-k {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-top: 6px;
+}
+
+/* motion */
+@media (prefers-reduced-motion: no-preference) {
+  .card-swap {
+    animation: cardin 0.3s ease-out;
+  }
+  @keyframes cardin {
+    from {
+      opacity: 0;
+      translate: 0 10px;
+    }
+    to {
+      opacity: 1;
+      translate: 0 0;
+    }
+  }
+  .pop-in {
+    animation: pop 0.5s ease-out;
+  }
+  @keyframes pop {
+    0% {
+      opacity: 0;
+      transform: scale(0.92);
+    }
+    60% {
+      transform: scale(1.03);
+    }
+    100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+}

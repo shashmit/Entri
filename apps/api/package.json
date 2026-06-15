@@ -1,0 +1,31 @@
+{
+  "name": "@entri/api",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch --env-file=.env src/index.ts",
+    "start": "tsx --env-file=.env src/index.ts",
+    "seed": "tsx --env-file=.env src/seed.ts",
+    "backfill-graph": "tsx --env-file=.env src/backfill-graph.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@entri/types": "workspace:*",
+    "@hono/node-server": "^1.13.7",
+    "@insforge/sdk": "latest",
+    "@openrouter/ai-sdk-provider": "^2.9.1",
+    "ai": "^6.0.203",
+    "hono": "^4.6.14",
+    "jszip": "^3.10.1",
+    "sarvamai": "^1.1.7",
+    "ts-fsrs": "^4.6.0",
+    "workers-ai-provider": "^3.1.14",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  }
+}

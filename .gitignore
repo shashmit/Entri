@@ -1,0 +1,31 @@
+
+# macOS
+.DS_Store
+
+# dependencies & build output (monorepo root)
+node_modules/
+.turbo
+.next/
+dist/
+*.tsbuildinfo
+
+# env — keep .env.example committed
+.env
+.env*.local
+*.pem
+
+# InsForge & AI agent skills
+.insforge
+.agent
+.agents
+.augment
+.claude
+.cline
+.github/copilot*
+.kilocode
+.qoder
+.qwen
+.roo
+.trae
+.windsurf
+.gstack/
