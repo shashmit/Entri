@@ -68,9 +68,26 @@ export const NoteCardSchema = z.object({
   topic: z.string().nullable(),
   excerpt: z.string(),
   capturedAt: z.string(),
+  collectionId: z.string().nullable(),
 });
 export type NoteCard = z.infer<typeof NoteCardSchema>;
 export const NoteCardListSchema = z.array(NoteCardSchema);
+
+/** GET /v1/collections — the user's note collections, with how many live notes
+ * each currently holds. A note belongs to at most one collection. */
+export const CollectionSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  noteCount: z.number(),
+});
+export type Collection = z.infer<typeof CollectionSchema>;
+export const CollectionListSchema = z.array(CollectionSchema);
+
+/** POST /v1/collections, PATCH /v1/collections/:id body. */
+export const CollectionUpsertSchema = z.object({
+  name: z.string().trim().min(1, "name required").max(80),
+});
+export type CollectionUpsert = z.infer<typeof CollectionUpsertSchema>;
 
 /** GET /v1/inferred — AI-inferred facts awaiting the user's OK. */
 export const InferredItemSchema = z.object({
@@ -131,6 +148,7 @@ export const NoteDetailSchema = z.object({
   title: z.string(),
   ref: z.string(),
   topic: z.string().nullable(),
+  collectionId: z.string().nullable(),
   status: z.string(),
   capturedAt: z.string(),
   cards: z.array(NoteCardItemSchema),
@@ -276,5 +294,6 @@ export const NotePatchSchema = z.object({
   title: z.string().nullable().optional(),
   topic: z.string().nullable().optional(),
   source_ref: z.string().nullable().optional(),
+  collection_id: z.string().nullable().optional(),
 });
 export type NotePatch = z.infer<typeof NotePatchSchema>;

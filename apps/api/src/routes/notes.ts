@@ -15,6 +15,7 @@ type NoteRow = {
   title: string | null;
   source_ref: string | null;
   topic: string | null;
+  collection_id: string | null;
   created_at: string;
   items: { body: string | null }[];
 };
@@ -23,8 +24,8 @@ type NoteRow = {
 // Shared by GET and PATCH so both always return the same shape.
 async function loadDetail(db: InsForgeClient, id: string): Promise<NoteDetail | null> {
   const note = orThrow(
-    await db.database.from("notes").select("id, title, source_ref, topic, status, created_at, share_token").eq("id", id).is("deleted_at", null).maybeSingle()
-  ) as { id: string; title: string | null; source_ref: string | null; topic: string | null; status: string; created_at: string; share_token: string | null } | null;
+    await db.database.from("notes").select("id, title, source_ref, topic, collection_id, status, created_at, share_token").eq("id", id).is("deleted_at", null).maybeSingle()
+  ) as { id: string; title: string | null; source_ref: string | null; topic: string | null; collection_id: string | null; status: string; created_at: string; share_token: string | null } | null;
   if (!note) return null;
 
   const items = orThrow(
@@ -59,6 +60,7 @@ async function loadDetail(db: InsForgeClient, id: string): Promise<NoteDetail | 
     title: note.title ?? "Untitled note",
     ref: note.source_ref ?? "",
     topic: note.topic,
+    collectionId: note.collection_id,
     status: note.status,
     capturedAt: note.created_at,
     images: imgs.map((im) => ({
@@ -91,7 +93,7 @@ notes.get("/", async (c) => {
   const rows = orThrow(
     await db.database
       .from("notes")
-      .select("id, title, source_ref, topic, created_at, items(body)")
+      .select("id, title, source_ref, topic, collection_id, created_at, items(body)")
       .is("deleted_at", null)
       .order("created_at", { ascending: false })
       .limit(50)
@@ -103,6 +105,7 @@ notes.get("/", async (c) => {
       title: n.title ?? "Untitled note",
       ref: n.source_ref ?? "",
       topic: n.topic,
+      collectionId: n.collection_id,
       excerpt: n.items?.[0]?.body ?? "",
       capturedAt: n.created_at,
     }))

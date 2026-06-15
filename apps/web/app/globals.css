@@ -402,4 +402,28 @@ summary:focus-visible,
       transform: scale(1);
     }
   }
+  .modal-backdrop {
+    animation: modalfade 0.15s ease-out;
+  }
+  .modal-panel {
+    animation: modalpop 0.19s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+  @keyframes modalfade {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  @keyframes modalpop {
+    from {
+      opacity: 0;
+      transform: translateY(6px) scale(0.98);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
 }
