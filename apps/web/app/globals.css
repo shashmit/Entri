@@ -426,4 +426,18 @@ summary:focus-visible,
       transform: none;
     }
   }
+
+  /* CSS fallback for the 3D hamster loader when WebGL is unavailable:
+     a marigold ring that spins around a soft hub. */
+  .hamster-mount[data-fallback="1"] {
+    border-radius: 9999px;
+    border: 3px solid var(--line);
+    border-top-color: var(--marigold);
+    animation: hspin 0.8s linear infinite;
+  }
+  @keyframes hspin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
 }

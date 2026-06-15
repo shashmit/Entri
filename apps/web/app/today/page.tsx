@@ -5,6 +5,7 @@ import { useState } from "react";
 import { useAuth } from "@/lib/auth";
 import { useGet } from "@/lib/use-api";
 import { api } from "@/lib/api";
+import { Loader } from "@/components/HamsterLoader";
 import {
   daysUntil,
   nextExam,
@@ -92,6 +93,25 @@ export default function Today() {
     } finally {
       setActingId(null);
     }
+  }
+
+  // Hold the page behind the hamster until every section's data has landed, so
+  // the dashboard appears all at once rather than popping in piecemeal.
+  const stillLoading =
+    profile.loading ||
+    exams.loading ||
+    today.loading ||
+    streak.loading ||
+    readiness.loading ||
+    notes.loading ||
+    inferred.loading;
+
+  if (stillLoading) {
+    return (
+      <div className="min-h-[60vh] grid place-items-center">
+        <Loader label="Gathering your notes…" />
+      </div>
+    );
   }
 
   return (

@@ -14,6 +14,7 @@ import {
   type NoteCard,
   type NoteCardItem,
 } from "@/lib/api-types";
+import { Loader, HamsterLoader } from "@/components/HamsterLoader";
 
 const BUCKET = "note-images";
 
@@ -78,7 +79,7 @@ function SourcePages({ images }: { images: NoteDetail["images"] }) {
                 </a>
               ) : (
                 <div className="w-[140px] h-[180px] rounded-md border border-line bg-surface grid place-items-center">
-                  <span className="font-mono text-[10px] text-muted">loading…</span>
+                  <HamsterLoader size={44} />
                 </div>
               )}
               <div className="flex items-center justify-between mt-1.5 px-0.5">
@@ -229,7 +230,7 @@ export default function NoteDetailPage() {
       </Link>
 
       {loading ? (
-        <p className="text-muted text-[13.5px] mt-6 px-0.5">Loading…</p>
+        <Loader className="mt-6" />
       ) : error || !note ? (
         <div className="card p-8 text-center mt-6">
           <p className="font-display text-[19px] mb-1">Note not found.</p>

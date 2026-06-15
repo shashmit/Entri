@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { SharedNoteSchema, type SharedNote, type NoteCardItem } from "@/lib/api-types";
+import { Loader } from "@/components/HamsterLoader";
 
 const API = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8787";
 
@@ -68,7 +69,7 @@ export default function SharedNotePage() {
         </div>
 
         {state === "loading" ? (
-          <p className="text-muted text-[13.5px]">Loading…</p>
+          <Loader />
         ) : state === "missing" || !note ? (
           <div className="card p-8 text-center">
             <p className="font-display text-[19px] mb-1">This note isn&apos;t available.</p>

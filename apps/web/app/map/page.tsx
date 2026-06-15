@@ -7,13 +7,14 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useGet } from "@/lib/use-api";
 import { GraphSchema, type Graph, type GraphNode } from "@/lib/api-types";
 import ConceptInspector from "./ConceptInspector";
+import { Loader } from "@/components/HamsterLoader";
 
 // Canvas is client-only (force-graph reaches for `window` at import).
 const ForceGraph = dynamic(() => import("./ForceGraph"), {
   ssr: false,
   loading: () => (
     <div className="h-full grid place-items-center">
-      <span className="font-mono text-xs text-muted">drawing your map…</span>
+      <Loader label="Drawing your map…" />
     </div>
   ),
 });
@@ -85,7 +86,7 @@ export default function MapPage() {
       <div className="absolute inset-x-0 top-0 bottom-[calc(64px+env(safe-area-inset-bottom))] md:bottom-0">
         {loading ? (
           <div className="h-full grid place-items-center">
-            <span className="font-mono text-xs text-muted">loading…</span>
+            <Loader />
           </div>
         ) : error ? (
           <div className="h-full grid place-items-center text-center px-6">

@@ -8,6 +8,7 @@ import { useGet } from "@/lib/use-api";
 import { api } from "@/lib/api";
 import type { Profile } from "@/lib/api-types";
 import { ProfileSchema } from "@/lib/api-types";
+import { Loader } from "@/components/HamsterLoader";
 
 const MODES: { value: ThemeMode; icon: string; label: string; hint: string }[] = [
   { value: "light", icon: "◐", label: "Light", hint: "Warm paper, always" },
@@ -117,7 +118,7 @@ export default function Settings() {
       </p>
       <section className="card p-5 flex flex-col gap-4">
         {form === null ? (
-          <p className="text-muted text-[13.5px]">Loading…</p>
+          <Loader />
         ) : (
           <>
             <label className="flex flex-col gap-1.5">

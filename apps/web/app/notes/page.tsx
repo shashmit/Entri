@@ -6,6 +6,7 @@ import { useGet } from "@/lib/use-api";
 import { api } from "@/lib/api";
 import type { NoteCard, Collection } from "@/lib/api-types";
 import { NoteCardListSchema, CollectionListSchema } from "@/lib/api-types";
+import { Loader } from "@/components/HamsterLoader";
 
 const UNCATEGORIZED = "Uncategorized";
 
@@ -488,7 +489,7 @@ export default function Notes() {
       </div>
 
       {loading ? (
-        <p className="text-muted text-[13.5px] px-0.5">Loading…</p>
+        <Loader />
       ) : notes.length === 0 ? (
         <div className="card p-8 text-center">
           <p className="font-display text-[19px] mb-1">No notes yet.</p>

@@ -7,6 +7,7 @@ import { useGet } from "@/lib/use-api";
 import { api } from "@/lib/api";
 import type { ReviewCard, Streak } from "@/lib/api-types";
 import { ReviewCardListSchema, StreakSchema } from "@/lib/api-types";
+import { Loader } from "@/components/HamsterLoader";
 
 type Grade = "again" | "hard" | "good" | "easy";
 const RATING: Record<Grade, 1 | 2 | 3 | 4> = { again: 1, hard: 2, good: 3, easy: 4 };
@@ -75,7 +76,7 @@ export default function Review() {
   if (loading) {
     return (
       <main className="max-w-[640px] mx-auto px-[18px] pt-16 grid place-items-center">
-        <span className="font-mono text-xs text-muted">loading your set…</span>
+        <Loader label="Loading your set…" />
       </main>
     );
   }

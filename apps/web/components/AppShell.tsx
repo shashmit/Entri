@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { useAuth } from "@/lib/auth";
 import { useGet } from "@/lib/use-api";
 import { daysUntil, nextExam, ExamListSchema, type Exam } from "@/lib/api-types";
+import { Loader } from "@/components/HamsterLoader";
 
 /* ---------- icons (stroke, 1.8px — quiet, not cartoonish) ---------- */
 const ic = {
@@ -130,7 +131,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   if (loading || !user) {
     return (
       <div className="relative z-[2] min-h-dvh grid place-items-center">
-        <span className="font-mono text-xs text-muted">loading…</span>
+        <Loader />
       </div>
     );
   }
