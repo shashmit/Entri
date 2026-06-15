@@ -15,6 +15,7 @@ import { capture } from "./routes/capture.js";
 import { chat } from "./routes/chat.js";
 import { share } from "./routes/share.js";
 import { graph } from "./routes/graph.js";
+import { internal } from "./routes/internal.js";
 
 // The assembled Hono app: global middleware, public + authed route mounts, and
 // the error boundary. Kept separate from index.ts (server bootstrap) so the app
@@ -32,6 +33,9 @@ app.use(
 );
 
 app.get("/health", (c) => c.json({ ok: true }));
+
+// Platform-triggered (Vercel Cron), guarded by CRON_SECRET — see routes/internal.
+app.route("/internal", internal);
 
 // Public, unauthenticated: a shared note resolved by its share_token.
 app.route("/public/notes", share);

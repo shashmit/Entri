@@ -1,8 +1,10 @@
 import { Hono } from "hono";
+import { waitUntil } from "@vercel/functions";
 import type { AppEnv } from "../middleware/auth.js";
 import { admin } from "../lib/insforge.js";
 import { aiConfigured, extractionConfigured } from "../lib/ai.js";
-import { nudgeWorker } from "../services/ingest-worker.js";
+import { drainQueue, nudgeWorker } from "../services/ingest-worker.js";
+import { env } from "../config/env.js";
 import { orThrow } from "../utils/index.js";
 
 export const capture = new Hono<AppEnv>();
@@ -74,9 +76,13 @@ capture.post("/", async (c) => {
     .select("id");
   if (job.error) throw job.error;
 
-  // Kick the worker now instead of waiting for the next poll tick (up to POLL_MS).
-  // Fire-and-forget: the durable queue still guarantees the job runs regardless.
-  nudgeWorker();
+  // Process the job promptly. On Vercel there's no persistent worker, so drain in
+  // this invocation's background (waitUntil keeps the function alive past the
+  // response, bounded by maxDuration); the daily cron is the backstop. On a
+  // long-running host the in-process worker is already polling — just nudge it.
+  // Either way the durable queue guarantees the job eventually runs.
+  if (env.VERCEL) waitUntil(drainQueue({ maxJobs: 1 }));
+  else nudgeWorker();
 
   return c.json({ noteId: note.id, status: "queued" });
 });

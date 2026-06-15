@@ -15,6 +15,7 @@
     "@hono/node-server": "^1.13.7",
     "@insforge/sdk": "latest",
     "@openrouter/ai-sdk-provider": "^2.9.1",
+    "@vercel/functions": "^2.0.0",
     "ai": "^6.0.203",
     "hono": "^4.6.14",
     "jszip": "^3.10.1",

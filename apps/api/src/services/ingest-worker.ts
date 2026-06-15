@@ -9,6 +9,9 @@ import { newCard } from "./fsrs.js";
 const BUCKET = "note-images";
 const POLL_MS = 3000;
 const BACKOFF_MS = 30_000;
+// A job that has sat in "running" longer than this is presumed orphaned (e.g. a
+// serverless invocation timed out mid-ingest) and gets requeued by drainQueue().
+const STALE_RUNNING_MS = 2 * 60_000;
 
 // In-process ingest worker. Drains the `jobs` queue (claim-then-isolate: claims
 // across tenants via the admin client, then scopes all work to job.user_id).
@@ -34,6 +37,38 @@ export function startWorker() {
   setTimeout(tick, POLL_MS);
 }
 
+// Serverless drain (Vercel). No persistent process polls the queue there, so the
+// capture route (waitUntil) and a daily cron call this to drain queued jobs in a
+// bounded loop. Returns how many it processed. First requeues any orphaned
+// "running" jobs (a prior invocation that timed out mid-ingest) so they retry.
+export async function drainQueue({
+  maxJobs = 25,
+  deadlineMs = 55_000,
+}: { maxJobs?: number; deadlineMs?: number } = {}): Promise<{ processed: number; skipped?: string }> {
+  if (!aiConfigured() || !extractionConfigured()) return { processed: 0, skipped: "ai-not-configured" };
+  await reclaimStaleRunning();
+
+  const start = Date.now();
+  let processed = 0;
+  while (processed < maxJobs && Date.now() - start < deadlineMs) {
+    const didWork = await drainOne();
+    if (!didWork) break; // queue empty
+    processed += 1;
+  }
+  return { processed };
+}
+
+async function reclaimStaleRunning() {
+  const cutoff = new Date(Date.now() - STALE_RUNNING_MS).toISOString();
+  const reset = await admin.database
+    .from("jobs")
+    .update({ status: "queued" })
+    .eq("type", "ingest")
+    .eq("status", "running")
+    .lt("claimed_at", cutoff);
+  if (reset.error) console.error("[worker] reclaim stale jobs failed", reset.error);
+}
+
 let workerReady = false;
 let draining = false;
 
@@ -57,7 +92,9 @@ export function nudgeWorker() {
 
 type Job = { id: string; user_id: string; payload: { noteId?: string }; attempts: number; max_attempts: number };
 
-async function drainOne() {
+// Claims and processes one queued ingest job. Returns true if a job was claimed
+// (so callers can loop until the queue is empty), false if there was nothing to do.
+async function drainOne(): Promise<boolean> {
   const nowIso = new Date().toISOString();
   const found = await admin.database
     .from("jobs")
@@ -69,7 +106,7 @@ async function drainOne() {
     .limit(1);
   if (found.error) throw found.error;
   const job = (found.data?.[0] as Job | undefined) ?? null;
-  if (!job) return;
+  if (!job) return false;
 
   // Claim it (guard on status so a second worker can't double-take).
   const claim = await admin.database
@@ -79,7 +116,7 @@ async function drainOne() {
     .eq("status", "queued")
     .select("id");
   if (claim.error) throw claim.error;
-  if (!claim.data?.length) return; // someone else claimed it
+  if (!claim.data?.length) return false; // someone else claimed it
 
   console.log(`[worker] ingest job ${job.id} (note ${job.payload?.noteId})`);
   try {
@@ -103,6 +140,7 @@ async function drainOne() {
     }
     console.error(`[worker] job ${job.id} failed (attempt ${attempts}${dead ? ", DEAD" : ""})`, e);
   }
+  return true; // a job was claimed (whether it succeeded or was requeued)
 }
 
 async function processIngest(job: Job) {
